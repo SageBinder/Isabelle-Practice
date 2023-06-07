@@ -1,32 +1,20 @@
 theory Testing
-  imports Complex_Main
+  imports "HOL-Analysis.Multivariate_Analysis"
 
 begin
 
-definition nondecreasing_on :: "real set \<Rightarrow> (real \<Rightarrow> real) \<Rightarrow> bool"
-  where "nondecreasing_on S f \<longleftrightarrow> (\<forall>x\<in>S. \<forall>y\<in>S. x \<le> y \<longrightarrow> f x \<le> f y)"
-
-(* definition id :: "'a \<Rightarrow> 'a" where "id = (\<lambda>x. x)" *)
-
-lemma id_nondecreasing: "nondecreasing_on {1,2,3} id"
+lemma interior_ball: "(x \<in> interior S) \<longleftrightarrow> (\<exists> e. 0 < e & (ball x e) \<subseteq> S)"
 proof-
-{ assume "x \<in> {1,2,3}"
-  then have "id x = x" by auto
-  
-
-lemma sum_square: "(a + b)^2 = a^2 + (2::real)*a*b + b^2"
-  apply (simp add:power2_eq_square)
-  apply (simp add:algebra_simps)
-done
-
-lemma nonneg_quadratic: "x^2 + (6::real)*x + 9 \<ge> 0"
-proof-
-  have aux: "x^2 + (6::real)*x + 9 = (x + 3)^2"
-    using sum_square [of x 3] by auto
-  have "(x + 3)^2 \<ge> 0"
-    using zero_le_square [of "x+3"] by auto
-   from this show ?thesis using aux by auto
+  { assume "x \<in> interior S"
+    from this obtain T where T_def: "open T & x \<in> T & T \<subseteq> S" using interior_def by auto
+    hence "\<exists> e. 0 < e & (ball x e) \<subseteq> T" using open_contains_ball by auto
+    hence "\<exists> e. 0 < e & (ball x e) \<subseteq> S" using T_def by auto
+  } note imp1 = this
+  { assume "(\<exists> e. 0 < e & (ball x e) \<subseteq> S)"
+    from this obtain e where e_def: "0 < e & (ball x e) \<subseteq> S" by auto
+    obtain T where T_def: "T = ball x e" by auto
+    then have "open T & x \<in> T & T \<subseteq> S" using open_ball e_def by auto
+    hence "x \<in> interior S" using interior_def by auto
+  } from this show ?thesis using imp1 by auto
 qed
-
-
 end
