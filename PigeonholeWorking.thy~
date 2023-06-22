@@ -13,9 +13,9 @@ proof-
   obtain x A' where "x \<in> A \<and> x \<notin> A' \<and> card A' = card A - 1 \<and> A' \<subseteq> A"
       using assms(2) card_eq_SucD [of "A" "card A - 1"] by auto
   hence x: "x \<in> A" "x \<notin> A'" "card A' = card A - 1" "A' \<subseteq> A" by auto
-  then have A'_card: "card A' = card A - 1" by auto
-  have "... \<ge> 1" using assms(2) by auto
-  hence "card A' \<ge> 1" by (auto simp: A'_card)
+  hence A'_card: "card A' = card A - 1" by auto
+  also have "... \<ge> 1" using assms(2) by auto
+  finally have "card A' \<ge> 1" by auto
   then obtain y where y: "y \<in> A'" using card_eq_SucD [of "A'" "card A' - 1"] by auto
   from that show ?thesis using x y by auto
 qed
@@ -76,6 +76,16 @@ next
     ultimately show ?thesis using Suc.IH[of "A'" "B'"] by auto
   qed
 qed
+
+theorem pigeonhole_obtain:
+  fixes f :: "'a \<Rightarrow> 'b" and
+        A :: "'a set" and
+        B :: "'b set"
+  assumes "finite A" and
+          "finite B" and
+          "card A > card B" and
+          "\<forall>x \<in> A. f x \<in> B"
+  obtains x y where "f x = f y" using pigeonhole by auto
 
 theorem pigeonhole_app:
   fixes f :: "nat \<Rightarrow> nat" and
